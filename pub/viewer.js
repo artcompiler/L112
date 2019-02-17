@@ -676,7 +676,7 @@ window.gcexports.viewer = function () {
       var elts = _render(data, props);
       return React.createElement(
         "div",
-        { className: "L133" },
+        { className: "L112" },
         elts
       );
     }
@@ -42656,7 +42656,6 @@ var unsafeHeaders = [
 	'trailer',
 	'transfer-encoding',
 	'upgrade',
-	'user-agent',
 	'via'
 ]
 
