@@ -10,6 +10,7 @@ import {
   encodeID,
   validate,
 } from "./share.js"
+import * as d3 from "d3";
 
 reserveCodeRange(1000, 1999, "compile");
 messages[1001] = "Node ID %1 not found in pool.";
@@ -88,7 +89,7 @@ const transform = (function() {
         });
       });
     });
-  };
+  }
   function str(node, options, resume) {
     let val = node.elts[0];
     resume([], val);
@@ -146,8 +147,22 @@ const transform = (function() {
     }
   }
   function inData(node, options, resume) {
-    let data = options.data ? options.data : [];
-    resume([], data);
+    // If there is input data, then use it, otherwise use default data.
+    if (node.elts.length === 0) {
+      // No args, so use the given data or empty.
+      let data = options.data ? options.data : [];
+      resume([], data);
+    } else {
+      visit(node.elts[0], options, function (err1, val1) {
+        if (false) {
+          err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+        }
+        let data =
+          options.data && Object.keys(options.data).length !== 0 && options.data ||
+          val1;
+        resume([].concat(err1), data);
+      });
+    }
   }
   function arg(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
@@ -366,6 +381,10 @@ let render = (function() {
 export let compiler = (function () {
   exports.version = "v1.0.0";
   exports.compile = function compile(code, data, resume) {
+    // var root = d3.stratify()
+    //   .id(function(d) { console.log("c:" + d.product_name); return d.product_name; })
+    //   .parentId(function(d) { console.log("p:" + d.category); return d.category; })(data);
+//    console.log("compile() root=" + JSON.stringify(root.children, null, 2));
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
