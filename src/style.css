@@ -180,3 +180,15 @@
 .axis--x path {
   display: none;
 }
+
+// D3 Packing
+
+text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.node--hover circle {
+  stroke: #000;
+  stroke-width: 1.2px;
+}

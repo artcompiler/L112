@@ -1,5 +1,6 @@
 /* @flow */
 window.gcexports.globalLexicon = {
+  "pack" : { "tk": 1, "name": "PACK-CHART", "cls": "function", "length": 1, "arity": 1 },
   "bar" : { "tk": 1, "name": "BAR-CHART", "cls": "function", "length": 2, "arity": 2 },
   "val" : { "tk": 1, "name": "VAL", "cls": "function", "length": 2 , "arity": 2 },
   "key" : { "tk": 1, "name": "KEY", "cls": "function", "length": 2 , "arity": 2 },

@@ -372,6 +372,9 @@ window.gcexports.viewer = function () {
         case "bar-chart":
           elts.push(React.createElement(BarChart, _extends({ key: i, style: n.style }, n)));
           break;
+        case "pack-chart":
+          elts.push(React.createElement(PackChart, _extends({ key: i, style: n.style }, n)));
+          break;
         case "twoColumns":
           elts.push(React.createElement(
             "div",
@@ -615,55 +618,76 @@ window.gcexports.viewer = function () {
     });
     return elts;
   }
-  var BarChart = React.createClass({
-    displayName: "BarChart",
+  var PackChart = React.createClass({
+    displayName: "PackChart",
     componentDidMount: function componentDidMount() {
       this.componentDidUpdate();
     },
     componentDidUpdate: function componentDidUpdate() {
-      var data = [];
-      var cols = this.props.args.cols;
-      var vals = this.props.args.vals;
-      var lblName = cols[0];
-      var valName = cols[1];
-      vals.forEach(function (v) {
-        var d = {};
-        d[lblName] = v[lblName];
-        d[valName] = v[valName];
-        data.push(d);
+      var root = d3.hierarchy(this.props.args.data).sum(function (d) {
+        return 1;
       });
-      d3.select("svg.bar-chart").html("<g/>");
-      var svg = d3.select("svg.bar-chart"),
-          margin = { top: 20, right: 20, bottom: 30, left: 40 },
-          width = +svg.attr("width") - margin.left - margin.right,
-          height = +svg.attr("height") - margin.top - margin.bottom;
+      //         .sort(function(a, b) { return b.value - a.value; });
 
-      var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
-          y = d3.scaleLinear().rangeRound([height, 0]);
+      var svg = d3.select("svg.pack-chart"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height");
+      var format = d3.format(",d");
+      var color = d3.scaleSequential(d3.interpolateMagma).domain([-4, 4]);
+      var pack = d3.pack().size([width - 2, height - 2]).radius(function (d) {
+        return 30; //d.data.name.length * 6;
+      }).padding(3);
+      pack(root);
+      var node = svg.selectAll("g").data(root.descendants()).enter().append("g").attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      }).attr("class", function (d) {
+        return "node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root");
+      }).each(function (d) {
+        d.node = this;
+      }).on("mouseover", hovered(true)).on("mouseout", hovered(false));
 
-      var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      x.domain(data.map(function (d) {
-        return d[lblName];
-      }));
-      y.domain([0, d3.max(data, function (d) {
-        return d[valName];
-      })]);
-
-      g.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
-
-      g.append("g").attr("class", "axis axis--y").call(d3.axisLeft(y).ticks(10, "%")).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("text-anchor", "end").text("Frequency");
-
-      g.selectAll(".bar").data(data).enter().append("rect").attr("class", "bar").attr("x", function (d) {
-        return x(d[lblName]);
-      }).attr("y", function (d) {
-        return y(d[valName]);
-      }).attr("width", x.bandwidth()).attr("height", function (d) {
-        return height - y(d.frequency);
+      node.append("circle").attr("id", function (d) {
+        return "node-" + d.data.name;
+      }).attr("r", function (d) {
+        return d.r;
+      }).style("fill", function (d) {
+        return color(d.depth);
       });
+
+      var leaf = node.filter(function (d) {
+        return !d.children;
+      });
+
+      leaf.append("clipPath").attr("id", function (d) {
+        return "clip-" + d.data.name;
+      }).append("use").attr("xlink:href", function (d) {
+        return "#node-" + d.data.name + "";
+      });
+
+      leaf.append("text").attr("clip-path", function (d) {
+        return "url(#clip-" + d.data.name + ")";
+      }).attr("text-anchor", "middle").selectAll("tspan").data(function (d) {
+        return d.data.name.split(/(?=[A-Z][^A-Z])/g);
+      }).enter().append("tspan").attr("x", 0).attr("y", function (d, i, nodes) {
+        return 13 + (i - nodes.length / 2 - 0.5) * 10;
+      }).text(function (d) {
+        return d;
+      });
+
+      node.append("title").text(function (d) {
+        return d.data.name + "\n" + format(d.value);
+      });
+
+      function hovered(hover) {
+        return function (d) {
+          d3.selectAll(d.ancestors().map(function (d) {
+            return d.node;
+          })).classed("node--hover", hover);
+        };
+      }
     },
     render: function render() {
-      return React.createElement("svg", { className: "bar-chart", width: "960", height: "500" });
+      return React.createElement("svg", { className: "pack-chart", width: "2000", height: "2000" });
     }
   });
   var Viewer = React.createClass({

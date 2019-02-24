@@ -20,7 +20,7 @@ messages[1004] = "No visitor method defined for '%1'.";
 
 const transform = (function() {
   const table = {
-    "BAR-CHART": barChart,
+    "PACK-CHART": packChart,
     "PROG" : program,
     "EXPRS" : exprs,
     "STR": str,
@@ -75,18 +75,14 @@ const transform = (function() {
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
-  function barChart(node, options, resume) {
+  function packChart(node, options, resume) {
     visit(node.elts[0], options, function (err0, val0) {
-      visit(node.elts[1], options, function (err1, val1) {
-        let cols = val0;
-        let vals = val1;
-        resume([].concat(err0).concat(err1), {
-          type: "bar-chart",
-          args: {
-            cols: cols,
-            vals: vals,
-          }
-        });
+      let data = stratify(val0);
+      resume([].concat(err0), {
+        type: "pack-chart",
+        args: {
+          data: data,
+        }
       });
     });
   }
@@ -157,9 +153,8 @@ const transform = (function() {
         if (false) {
           err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
         }
-        let data =
-          options.data && Object.keys(options.data).length !== 0 && options.data ||
-          val1;
+        console.log("inData() options=" + JSON.stringify(options));
+        let data = options.data && Object.keys(options.data).length != 0 ? options.data : val1;
         resume([].concat(err1), data);
       });
     }
@@ -362,7 +357,7 @@ const transform = (function() {
   }
   return transform;
 })();
-let render = (function() {
+const render = (function() {
   function escapeXML(str) {
     return String(str)
       .replace(/&(?!\w+;)/g, "&amp;")
@@ -378,15 +373,64 @@ let render = (function() {
   }
   return render;
 })();
+
+const unpack = (data) => {
+  let kids = [];
+  console.log("unpack() data=" + JSON.stringify(data));
+  if (typeof data === "object") {
+    Object.keys(data).forEach((k) => {
+      if (k !== "type" && k !== "logo") {
+        let kid = {
+          name: k,
+          type: data[k].type,
+          logo: data[k].logo,
+        };
+        kid["children"] = unpack(data[k]);
+        kids.push(kid);
+      }
+    });
+  }
+  return kids.length && kids || undefined;
+};
+const stratify = (data) => {
+  let root = {};
+  console.log("stratify() data=" + JSON.stringify(data));
+  data.forEach(({
+    company_name,
+    company_logo,
+    product_name,
+    product_logo,
+    category
+  }) => {
+    if (!root[company_name]) {
+      root[company_name] = {
+        type: "business",
+        logo: company_logo,
+      };
+    }
+    if (!root[company_name][category]) {
+      root[company_name][category] = {
+        type: "category",
+      };
+    }
+    if (!root[company_name][category][product_name]) {
+      root[company_name][category][product_name] = {
+        type: "product",
+        logo: product_logo,
+      };
+    }
+  });
+  console.log("stratify() root=" + JSON.stringify(root, null, 2));
+  root = {
+    name: "root",
+    children: unpack(root),
+  }
+  console.log("stratify() root=" + JSON.stringify(root, null, 2));
+  return root;
+};
 export let compiler = (function () {
   exports.version = "v1.0.0";
   exports.compile = function compile(code, data, resume) {
-    // var root = d3.stratify()
-    //   .id(function(d) { console.log("c:" + d.product_name); return d.product_name; })
-    //   .parentId(function(d) { console.log("p:" + d.category); return d.category; })(data);
-//    console.log("compile() root=" + JSON.stringify(root.children, null, 2));
-    // Compiler takes an AST in the form of a node pool and transforms it into
-    // an object to be rendered on the client by the viewer for this language.
     try {
       let options = {
         data: data
