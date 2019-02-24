@@ -153,7 +153,6 @@ const transform = (function() {
         if (false) {
           err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
         }
-        console.log("inData() options=" + JSON.stringify(options));
         let data = options.data && Object.keys(options.data).length != 0 ? options.data : val1;
         resume([].concat(err1), data);
       });
@@ -376,7 +375,6 @@ const render = (function() {
 
 const unpack = (data) => {
   let kids = [];
-  console.log("unpack() data=" + JSON.stringify(data));
   if (typeof data === "object") {
     Object.keys(data).forEach((k) => {
       if (k !== "type" && k !== "logo") {
@@ -394,7 +392,6 @@ const unpack = (data) => {
 };
 const stratify = (data) => {
   let root = {};
-  console.log("stratify() data=" + JSON.stringify(data));
   data.forEach(({
     company_name,
     company_logo,
@@ -420,12 +417,10 @@ const stratify = (data) => {
       };
     }
   });
-  console.log("stratify() root=" + JSON.stringify(root, null, 2));
   root = {
     name: "root",
     children: unpack(root),
   }
-  console.log("stratify() root=" + JSON.stringify(root, null, 2));
   return root;
 };
 export let compiler = (function () {

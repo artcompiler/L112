@@ -403,6 +403,7 @@ window.gcexports.viewer = (function () {
       leaf.append("text")
         .attr("clip-path", function(d) { return "url(#clip-" + d.data.name + ")"; })
         .attr("text-anchor", "middle")
+        .attr("font-size", "10")
         .selectAll("tspan")
         .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
         .enter().append("tspan")
@@ -421,7 +422,7 @@ window.gcexports.viewer = (function () {
     },
     render () {
       return (
-        <svg className="pack-chart" width="2000" height="2000"/>
+        <svg className="pack-chart" width="1000" height="1000"/>
       );
     },
   });
@@ -433,8 +434,11 @@ window.gcexports.viewer = (function () {
       var data = props.obj ? [].concat(props.obj) : [];
       var elts = render(data, props);
       return (
-        <div className="L112">
-          {elts}
+        <div>
+          <link rel="stylesheet" href="https://l112.artcompiler.com/style.css" />
+          <div className="L112">
+            {elts}
+          </div>
         </div>
       );
     },
