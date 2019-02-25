@@ -378,7 +378,7 @@ window.gcexports.viewer = (function () {
       var pack = d3.pack()
           .size([width - 2, height - 2])
           .radius(d => {
-            return d.data.type === "label" && 50 || 30; //d.data.name.length * 6;
+            return d.data.type === "label" && 40 || 30; //d.data.name.length * 6;
           })
           .padding(3);
       pack(root);
@@ -416,13 +416,15 @@ window.gcexports.viewer = (function () {
         .attr("clip-path", function(d) { return "url(#clip-" + d.data.name + ")"; })
         .attr("text-anchor", "middle")
         .attr("font-size", d => {
-          return d.data.type === "label" && 14 || 10;
+          return d.data.type === "label" && 13 || 10;
         })
         .selectAll("tspan")
         .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
         .enter().append("tspan")
         .attr("x", 0)
-        .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
+        .attr("y", function(d, i, nodes) {
+          return 13 + (i - nodes.length / 2 - 0.5) * 12;
+        })
         .text(function(d) { return d; });
 
       node.append("title")
