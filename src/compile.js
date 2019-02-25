@@ -21,6 +21,7 @@ messages[1004] = "No visitor method defined for '%1'.";
 const transform = (function() {
   const table = {
     "PACK-CHART": packChart,
+    "TREEMAP-CHART": treemapChart,
     "PROG" : program,
     "EXPRS" : exprs,
     "STR": str,
@@ -80,6 +81,17 @@ const transform = (function() {
       let data = stratify(val0);
       resume([].concat(err0), {
         type: "pack-chart",
+        args: {
+          data: data,
+        }
+      });
+    });
+  }
+  function treemapChart(node, options, resume) {
+    visit(node.elts[0], options, function (err0, val0) {
+      let data = stratify(val0);
+      resume([].concat(err0), {
+        type: "treemap-chart",
         args: {
           data: data,
         }
@@ -372,8 +384,7 @@ const render = (function() {
   }
   return render;
 })();
-
-const unpack = (data) => {
+const unpack = (name, data) => {
   let kids = [];
   if (typeof data === "object") {
     Object.keys(data).forEach((k) => {
@@ -383,10 +394,16 @@ const unpack = (data) => {
           type: data[k].type,
           logo: data[k].logo,
         };
-        kid["children"] = unpack(data[k]);
+        kid["children"] = unpack((data[k].type === "category" || data[k].type === "business") && k, data[k]);
         kids.push(kid);
       }
     });
+    if (name) {
+      kids.push({
+        name: name,
+        type: "label",
+      });
+    }
   }
   return kids.length && kids || undefined;
 };
@@ -419,7 +436,7 @@ const stratify = (data) => {
   });
   root = {
     name: "root",
-    children: unpack(root),
+    children: unpack(null, root),
   }
   return root;
 };

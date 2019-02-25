@@ -109,6 +109,11 @@ window.gcexports.viewer = (function () {
           <PackChart key={i} style={n.style} {...n}/>
         );
         break;
+      case "treemap-chart":
+        elts.push(
+          <TreemapChart key={i} style={n.style} {...n}/>
+        );
+        break;
       case "twoColumns":
         elts.push(
           <div className="two columns" key={i} style={n.style} {...n.attrs}>
@@ -373,7 +378,7 @@ window.gcexports.viewer = (function () {
       var pack = d3.pack()
           .size([width - 2, height - 2])
           .radius(d => {
-            return 30; //d.data.name.length * 6;
+            return d.data.type === "label" && 50 || 30; //d.data.name.length * 6;
           })
           .padding(3);
       pack(root);
@@ -391,7 +396,14 @@ window.gcexports.viewer = (function () {
         .attr("r", function(d) {
           return d.r;
         })
-        .style("fill", function(d) { return color(d.depth); });
+        .style("fill", function(d) {
+          return (
+            d.depth === 0 && "#888" ||
+            (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "#AAA" ||
+            (d.depth === 2 || d.data.type === "label") && "#CCC" ||
+            "#EEE"
+          );
+        });
 
       var leaf = node.filter(function(d) { return !d.children; });
 
@@ -403,7 +415,9 @@ window.gcexports.viewer = (function () {
       leaf.append("text")
         .attr("clip-path", function(d) { return "url(#clip-" + d.data.name + ")"; })
         .attr("text-anchor", "middle")
-        .attr("font-size", "10")
+        .attr("font-size", d => {
+          return d.data.type === "label" && 14 || 10;
+        })
         .selectAll("tspan")
         .data(function(d) { return d.data.name.split(/(?=[A-Z][^A-Z])/g); })
         .enter().append("tspan")
@@ -422,7 +436,71 @@ window.gcexports.viewer = (function () {
     },
     render () {
       return (
-        <svg className="pack-chart" width="1000" height="1000"/>
+        <svg className="pack-chart" width="1500" height="1500"/>
+      );
+    },
+  });
+  var TreemapChart = React.createClass({
+    componentDidMount() {
+      this.componentDidUpdate();
+    },
+    componentDidUpdate() {
+      let root = d3.hierarchy(this.props.args.data)
+         .sum(function(d) {
+           return 100;
+         })
+//         .sort(function(a, b) { return b.value - a.value; });
+
+      const width = 1000;
+      const height = 700;
+      const format = d3.format(",d");
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+      let treemap = data => d3.treemap()
+                            .size([width, height])
+                            .padding(1)
+                            .round(true)(root);
+      const svg = d3.select("svg.treemap-chart")
+      .style("width", "100%")
+      .style("height", "auto")
+      .style("font", "10px sans-serif");
+
+  const leaf = svg.selectAll("g")
+    .data(root.leaves())
+    .join("g")
+      .attr("transform", d => {
+        return `translate(${d.x0},${d.y0})`
+      });
+
+  leaf.append("title")
+      .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}\n${format(d.value)}`);
+
+  leaf.append("rect")
+      .attr("id", d => (d.leafUid = d.data.name + "-rect"))
+      .attr("fill", d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
+      .attr("fill-opacity", 0.6)
+      .attr("width", d => d.x1 - d.x0)
+      .attr("height", d => d.y1 - d.y0);
+
+  leaf.append("clipPath")
+      .attr("id", d => (d.clipUid = d.data.name + "-clipPath"))
+    .append("use")
+      .attr("xlink:href", d => d.leafUid.href);
+
+  leaf.append("text")
+      .attr("clip-path", d => d.clipUid)
+    .selectAll("tspan")
+    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g).concat(format(d.value)))
+    .join("tspan")
+      .attr("x", 3)
+      .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
+      .attr("fill-opacity", (d, i, nodes) => i === nodes.length - 1 ? 0.7 : null)
+      .text(d => d);
+
+  return svg.node();
+    },
+    render () {
+      return (
+        <svg className="treemap-chart" width="1000" height="1000"/>
       );
     },
   });

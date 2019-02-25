@@ -375,6 +375,9 @@ window.gcexports.viewer = function () {
         case "pack-chart":
           elts.push(React.createElement(PackChart, _extends({ key: i, style: n.style }, n)));
           break;
+        case "treemap-chart":
+          elts.push(React.createElement(TreemapChart, _extends({ key: i, style: n.style }, n)));
+          break;
         case "twoColumns":
           elts.push(React.createElement(
             "div",
@@ -635,7 +638,7 @@ window.gcexports.viewer = function () {
       var format = d3.format(",d");
       var color = d3.scaleSequential(d3.interpolateMagma).domain([-4, 4]);
       var pack = d3.pack().size([width - 2, height - 2]).radius(function (d) {
-        return 30; //d.data.name.length * 6;
+        return d.data.type === "label" && 50 || 30; //d.data.name.length * 6;
       }).padding(3);
       pack(root);
       var node = svg.selectAll("g").data(root.descendants()).enter().append("g").attr("transform", function (d) {
@@ -651,7 +654,7 @@ window.gcexports.viewer = function () {
       }).attr("r", function (d) {
         return d.r;
       }).style("fill", function (d) {
-        return color(d.depth);
+        return d.depth === 0 && "#888" || (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "#AAA" || (d.depth === 2 || d.data.type === "label") && "#CCC" || "#EEE";
       });
 
       var leaf = node.filter(function (d) {
@@ -666,7 +669,9 @@ window.gcexports.viewer = function () {
 
       leaf.append("text").attr("clip-path", function (d) {
         return "url(#clip-" + d.data.name + ")";
-      }).attr("text-anchor", "middle").attr("font-size", "10").selectAll("tspan").data(function (d) {
+      }).attr("text-anchor", "middle").attr("font-size", function (d) {
+        return d.data.type === "label" && 14 || 10;
+      }).selectAll("tspan").data(function (d) {
         return d.data.name.split(/(?=[A-Z][^A-Z])/g);
       }).enter().append("tspan").attr("x", 0).attr("y", function (d, i, nodes) {
         return 13 + (i - nodes.length / 2 - 0.5) * 10;
@@ -687,7 +692,73 @@ window.gcexports.viewer = function () {
       }
     },
     render: function render() {
-      return React.createElement("svg", { className: "pack-chart", width: "1000", height: "1000" });
+      return React.createElement("svg", { className: "pack-chart", width: "1500", height: "1500" });
+    }
+  });
+  var TreemapChart = React.createClass({
+    displayName: "TreemapChart",
+    componentDidMount: function componentDidMount() {
+      this.componentDidUpdate();
+    },
+    componentDidUpdate: function componentDidUpdate() {
+      var root = d3.hierarchy(this.props.args.data).sum(function (d) {
+        return 100;
+      });
+      //         .sort(function(a, b) { return b.value - a.value; });
+
+      var width = 1000;
+      var height = 700;
+      var format = d3.format(",d");
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var treemap = function treemap(data) {
+        return d3.treemap().size([width, height]).padding(1).round(true)(root);
+      };
+      var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "10px sans-serif");
+
+      var leaf = svg.selectAll("g").data(root.leaves()).join("g").attr("transform", function (d) {
+        return "translate(" + d.x0 + "," + d.y0 + ")";
+      });
+
+      leaf.append("title").text(function (d) {
+        return d.ancestors().reverse().map(function (d) {
+          return d.data.name;
+        }).join("/") + "\n" + format(d.value);
+      });
+
+      leaf.append("rect").attr("id", function (d) {
+        return d.leafUid = d.data.name + "-rect";
+      }).attr("fill", function (d) {
+        while (d.depth > 1) {
+          d = d.parent;
+        }return color(d.data.name);
+      }).attr("fill-opacity", 0.6).attr("width", function (d) {
+        return d.x1 - d.x0;
+      }).attr("height", function (d) {
+        return d.y1 - d.y0;
+      });
+
+      leaf.append("clipPath").attr("id", function (d) {
+        return d.clipUid = d.data.name + "-clipPath";
+      }).append("use").attr("xlink:href", function (d) {
+        return d.leafUid.href;
+      });
+
+      leaf.append("text").attr("clip-path", function (d) {
+        return d.clipUid;
+      }).selectAll("tspan").data(function (d) {
+        return d.data.name.split(/(?=[A-Z][^A-Z])/g).concat(format(d.value));
+      }).join("tspan").attr("x", 3).attr("y", function (d, i, nodes) {
+        return (i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9 + "em";
+      }).attr("fill-opacity", function (d, i, nodes) {
+        return i === nodes.length - 1 ? 0.7 : null;
+      }).text(function (d) {
+        return d;
+      });
+
+      return svg.node();
+    },
+    render: function render() {
+      return React.createElement("svg", { className: "treemap-chart", width: "1000", height: "1000" });
     }
   });
   var Viewer = React.createClass({
