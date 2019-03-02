@@ -703,16 +703,21 @@ window.gcexports.viewer = function () {
     componentDidUpdate: function componentDidUpdate() {
       var root = d3.hierarchy(this.props.args.data).sum(function (d) {
         return 100;
+      }).sort(function (a, b) {
+        return b.value - a.value;
       });
-      //         .sort(function(a, b) { return b.value - a.value; });
 
       var width = 1000;
       var height = 700;
       var format = d3.format(",d");
       var color = d3.scaleOrdinal(d3.schemeCategory10);
-      var treemap = function treemap(data) {
-        return d3.treemap().size([width, height]).padding(1).round(true)(root);
-      };
+      var treemapLayout = d3.treemap()
+      //                          .tile(d3.treemapBinary)
+      //                          .tile(d3.treemapDice)
+      //                          .tile(d3.treemapSlice)
+      //                          .tile(d3.treemapSliceDice)
+      .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(3).paddingOuter(10).round(true);
+      treemapLayout(root);
       var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "10px sans-serif");
 
       var leaf = svg.selectAll("g").data(root.leaves()).join("g").attr("transform", function (d) {
@@ -727,14 +732,15 @@ window.gcexports.viewer = function () {
 
       leaf.append("rect").attr("id", function (d) {
         return d.leafUid = d.data.name + "-rect";
-      }).attr("fill", function (d) {
-        while (d.depth > 1) {
-          d = d.parent;
-        }return color(d.data.name);
-      }).attr("fill-opacity", 0.6).attr("width", function (d) {
+      })
+      //        .attr("fill", d => { while (d.depth > 0) d = d.parent; return color(d.depth - 1); })
+      //        .attr("fill-opacity", 0.6)
+      .attr("width", function (d) {
         return d.x1 - d.x0;
       }).attr("height", function (d) {
         return d.y1 - d.y0;
+      }).style("fill", function (d) {
+        return d.depth === 0 && "#888" || (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "FFF" || (d.depth === 2 || d.data.type === "label") && "#FFF" || "#DDD";
       });
 
       leaf.append("clipPath").attr("id", function (d) {
@@ -746,7 +752,7 @@ window.gcexports.viewer = function () {
       leaf.append("text").attr("clip-path", function (d) {
         return d.clipUid;
       }).selectAll("tspan").data(function (d) {
-        return d.data.name.split(/(?=[A-Z][^A-Z])/g).concat(format(d.value));
+        return d.data.name.split(/(?=[A-Z][^A-Z])/g);
       }).join("tspan").attr("x", 3).attr("y", function (d, i, nodes) {
         return (i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9 + "em";
       }).attr("fill-opacity", function (d, i, nodes) {

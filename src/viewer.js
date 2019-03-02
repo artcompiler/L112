@@ -451,54 +451,69 @@ window.gcexports.viewer = (function () {
          .sum(function(d) {
            return 100;
          })
-//         .sort(function(a, b) { return b.value - a.value; });
+         .sort(function(a, b) { return b.value - a.value; });
 
       const width = 1000;
       const height = 700;
       const format = d3.format(",d");
       const color = d3.scaleOrdinal(d3.schemeCategory10);
-      let treemap = data => d3.treemap()
-                            .size([width, height])
-                            .padding(1)
-                            .round(true)(root);
+      let treemapLayout = d3.treemap()
+//                          .tile(d3.treemapBinary)
+//                          .tile(d3.treemapDice)
+//                          .tile(d3.treemapSlice)
+//                          .tile(d3.treemapSliceDice)
+                          .tile(d3.treemapSquarify.ratio(1))
+                          .size([width, height])
+                          .paddingInner(3)
+                          .paddingOuter(10)
+                          .round(true);
+      treemapLayout(root);
       const svg = d3.select("svg.treemap-chart")
-      .style("width", "100%")
-      .style("height", "auto")
-      .style("font", "10px sans-serif");
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("font", "10px sans-serif");
 
-  const leaf = svg.selectAll("g")
-    .data(root.leaves())
-    .join("g")
-      .attr("transform", d => {
-        return `translate(${d.x0},${d.y0})`
-      });
+      const leaf = svg.selectAll("g")
+        .data(root.leaves())
+        .join("g")
+        .attr("transform", d => {
+          return `translate(${d.x0},${d.y0})`
+        });
 
-  leaf.append("title")
-      .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}\n${format(d.value)}`);
+      leaf.append("title")
+        .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}\n${format(d.value)}`);
 
-  leaf.append("rect")
-      .attr("id", d => (d.leafUid = d.data.name + "-rect"))
-      .attr("fill", d => { while (d.depth > 1) d = d.parent; return color(d.data.name); })
-      .attr("fill-opacity", 0.6)
-      .attr("width", d => d.x1 - d.x0)
-      .attr("height", d => d.y1 - d.y0);
+      leaf.append("rect")
+        .attr("id", d => (d.leafUid = d.data.name + "-rect"))
+//        .attr("fill", d => { while (d.depth > 0) d = d.parent; return color(d.depth - 1); })
+//        .attr("fill-opacity", 0.6)
+        .attr("width", d => d.x1 - d.x0)
+        .attr("height", d => d.y1 - d.y0)
+        .style("fill", function(d) {
+          return (
+            d.depth === 0 && "#888" ||
+            (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "FFF" ||
+            (d.depth === 2 || d.data.type === "label") && "#FFF" ||
+            "#DDD"
+          );
+        });
 
-  leaf.append("clipPath")
-      .attr("id", d => (d.clipUid = d.data.name + "-clipPath"))
-    .append("use")
-      .attr("xlink:href", d => d.leafUid.href);
+      leaf.append("clipPath")
+        .attr("id", d => (d.clipUid = d.data.name + "-clipPath"))
+        .append("use")
+        .attr("xlink:href", d => d.leafUid.href);
 
-  leaf.append("text")
-      .attr("clip-path", d => d.clipUid)
-    .selectAll("tspan")
-    .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g).concat(format(d.value)))
-    .join("tspan")
-      .attr("x", 3)
-      .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
-      .attr("fill-opacity", (d, i, nodes) => i === nodes.length - 1 ? 0.7 : null)
-      .text(d => d);
+      leaf.append("text")
+        .attr("clip-path", d => d.clipUid)
+        .selectAll("tspan")
+        .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+        .join("tspan")
+        .attr("x", 3)
+        .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
+        .attr("fill-opacity", (d, i, nodes) => i === nodes.length - 1 ? 0.7 : null)
+        .text(d => d);
 
-  return svg.node();
+      return svg.node();
     },
     render () {
       return (
