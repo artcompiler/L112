@@ -707,8 +707,11 @@ window.gcexports.viewer = function () {
         return b.value - a.value;
       });
 
-      var width = 1000;
-      var height = 700;
+      var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "14px sans-serif");
+
+      var width = +svg.attr("width"),
+          height = +svg.attr("height");
+
       var format = d3.format(",d");
       var color = d3.scaleOrdinal(d3.schemeCategory10);
       var treemapLayout = d3.treemap()
@@ -716,33 +719,31 @@ window.gcexports.viewer = function () {
       //                          .tile(d3.treemapDice)
       //                          .tile(d3.treemapSlice)
       //                          .tile(d3.treemapSliceDice)
-      .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(3).paddingOuter(3).paddingTop(23);
-      //                          .round(true);
+      .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(10).paddingOuter(10).paddingTop(45).round(true);
       treemapLayout(root);
-
-      var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "10px sans-serif");
 
       var leaf = svg.selectAll("g").data(root.children[0].descendants()).join("g").attr("transform", function (d) {
         return "translate(" + d.x0 + "," + d.y0 + ")";
+      }).style("font", function (d) {
+        return d.depth === 1 && "20px sans-serif" || "14px sans-serif";
       });
 
       leaf.append("title").text(function (d) {
-        return d.ancestors().reverse().map(function (d) {
-          return d.data.name;
-        }).join("/") + "\n" + format(d.value);
+        return d.data.name;
       });
 
       leaf.append("rect").attr("id", function (d) {
         return d.leafUid = d.data.name + "-rect";
       })
       //        .attr("fill", d => { while (d.depth > 0) d = d.parent; return color(d.depth - 1); })
-      //        .attr("fill-opacity", 0.6)
-      .attr("width", function (d) {
+      .attr("fill-opacity", 1.0).attr("width", function (d) {
         return d.x1 - d.x0;
       }).attr("height", function (d) {
         return d.y1 - d.y0;
-      }).style("fill", function (d) {
-        return d.depth === 0 && "#888" || d.depth === 1 && "#AAA" || d.depth === 2 && "#CCC" || "#EEE";
+      }).attr("rx", 10).attr("ry", 10).attr("stroke", function (d) {
+        return d.depth < 3 && "#AAA" || "#FFF";
+      }).attr("stroke-width", "1").style("fill", function (d) {
+        return d.depth === 0 && "#EEE" || d.depth === 1 && "#EEE" || d.depth === 2 && "#FFF" || "#FFF";
       });
 
       leaf.append("clipPath").attr("id", function (d) {
@@ -754,8 +755,9 @@ window.gcexports.viewer = function () {
       leaf.append("text").attr("clip-path", function (d) {
         return d.clipUid;
       }).selectAll("tspan").data(function (d) {
-        return d.data.type === "category" && [d.data.name] || d.data.name.split(/(?=[A-Z][^A-Z])/g);
-      }).join("tspan").attr("x", 3).attr("y", function (d, i, nodes) {
+        return (d.data.type === "business" || d.data.type === "category") && d.data.name.split(/(?=[A-Z][^A-Z])/g).slice(0, 2) || "" //d.data.name.split(/(?=[A-Z][^A-Z])/g)
+        ;
+      }).join("tspan").attr("x", 10).attr("y", function (d, i, nodes) {
         return (i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9 + "em";
       }).attr("fill-opacity", function (d, i, nodes) {
         return i === nodes.length - 1 ? 0.7 : null;
@@ -763,10 +765,16 @@ window.gcexports.viewer = function () {
         return d;
       });
 
+      leaf.append("image").attr("clip-path", function (d) {
+        return d.clipUid;
+      }).attr("xlink:href", function (d) {
+        return d.depth > 1 && d.data.logo || undefined;
+      }).attr("width", 50).attr("x", 3).attr("y", 3);
+
       return svg.node();
     },
     render: function render() {
-      return React.createElement("svg", { className: "treemap-chart", width: "1000", height: "600" });
+      return React.createElement("svg", { className: "treemap-chart", width: "1200", height: "800" });
     }
   });
   var Viewer = React.createClass({

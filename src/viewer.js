@@ -453,8 +453,14 @@ window.gcexports.viewer = (function () {
          })
          .sort(function(a, b) { return b.value - a.value; });
 
-      const width = 1000;
-      const height = 700;
+      const svg = d3.select("svg.treemap-chart")
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("font", "14px sans-serif");
+
+      const width = +svg.attr("width"),
+            height = +svg.attr("height");
+
       const format = d3.format(",d");
       const color = d3.scaleOrdinal(d3.schemeCategory10);
       let treemapLayout = d3.treemap()
@@ -464,41 +470,43 @@ window.gcexports.viewer = (function () {
 //                          .tile(d3.treemapSliceDice)
                           .tile(d3.treemapSquarify.ratio(1))
                           .size([width, height])
-                          .paddingInner(3)
-                          .paddingOuter(3)
-                          .paddingTop(23)
-//                          .round(true);
+                          .paddingInner(10)
+                          .paddingOuter(10)
+                          .paddingTop(45)
+                          .round(true);
       treemapLayout(root);
-
-      const svg = d3.select("svg.treemap-chart")
-        .style("width", "100%")
-        .style("height", "auto")
-        .style("font", "10px sans-serif");
 
       const leaf = svg.selectAll("g")
         .data(root.children[0].descendants())
         .join("g")
         .attr("transform", d => {
           return `translate(${d.x0},${d.y0})`
+        })
+        .style("font", d => {
+          return d.depth === 1 && "20px sans-serif" || "14px sans-serif";
         });
 
       leaf.append("title")
-        .text(d => `${d.ancestors().reverse().map(d => d.data.name).join("/")}\n${format(d.value)}`);
+        .text(d => d.data.name);
 
       leaf.append("rect")
         .attr("id", d => (d.leafUid = d.data.name + "-rect"))
 //        .attr("fill", d => { while (d.depth > 0) d = d.parent; return color(d.depth - 1); })
-//        .attr("fill-opacity", 0.6)
+        .attr("fill-opacity", 1.0)
         .attr("width", d => d.x1 - d.x0)
         .attr("height", d => d.y1 - d.y0)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .attr("stroke", d => d.depth < 3 && "#AAA" || "#FFF")
+        .attr("stroke-width", "1")
         .style("fill", function(d) {
           return (
-            d.depth === 0 && "#888" ||
-            d.depth === 1 && "#AAA" ||
-            d.depth === 2 && "#CCC" ||
-            "#EEE"
+            d.depth === 0 && "#EEE" ||
+            d.depth === 1 && "#EEE" ||
+            d.depth === 2 && "#FFF" ||
+            "#FFF"
           );
-        });
+        })
 
       leaf.append("clipPath")
         .attr("id", d => (d.clipUid = d.data.name + "-clipPath"))
@@ -510,21 +518,30 @@ window.gcexports.viewer = (function () {
         .selectAll("tspan")
         .data(d => {
           return (
-            d.data.type === "category" && [d.data.name] ||
-            d.data.name.split(/(?=[A-Z][^A-Z])/g)
+            (d.data.type === "business" || d.data.type === "category") && d.data.name.split(/(?=[A-Z][^A-Z])/g).slice(0,2) ||
+            "" //d.data.name.split(/(?=[A-Z][^A-Z])/g)
           );
         })
         .join("tspan")
-        .attr("x", 3)
+        .attr("x", 10)
         .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
         .attr("fill-opacity", (d, i, nodes) => i === nodes.length - 1 ? 0.7 : null)
         .text(d => d);
+
+      leaf.append("image")
+        .attr("clip-path", d => d.clipUid)
+        .attr("xlink:href", d => {
+          return d.depth > 1 && d.data.logo || undefined
+        })
+        .attr("width", 50)
+        .attr("x", 3)
+        .attr("y", 3);
 
       return svg.node();
     },
     render () {
       return (
-        <svg className="treemap-chart" width="1000" height="600"/>
+        <svg className="treemap-chart" width="1200" height="800"/>
       );
     },
   });
