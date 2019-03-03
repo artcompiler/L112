@@ -716,11 +716,13 @@ window.gcexports.viewer = function () {
       //                          .tile(d3.treemapDice)
       //                          .tile(d3.treemapSlice)
       //                          .tile(d3.treemapSliceDice)
-      .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(3).paddingOuter(10).round(true);
+      .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(3).paddingOuter(3).paddingTop(23);
+      //                          .round(true);
       treemapLayout(root);
+
       var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "10px sans-serif");
 
-      var leaf = svg.selectAll("g").data(root.leaves()).join("g").attr("transform", function (d) {
+      var leaf = svg.selectAll("g").data(root.children[0].descendants()).join("g").attr("transform", function (d) {
         return "translate(" + d.x0 + "," + d.y0 + ")";
       });
 
@@ -740,7 +742,7 @@ window.gcexports.viewer = function () {
       }).attr("height", function (d) {
         return d.y1 - d.y0;
       }).style("fill", function (d) {
-        return d.depth === 0 && "#888" || (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "FFF" || (d.depth === 2 || d.data.type === "label") && "#FFF" || "#DDD";
+        return d.depth === 0 && "#888" || d.depth === 1 && "#AAA" || d.depth === 2 && "#CCC" || "#EEE";
       });
 
       leaf.append("clipPath").attr("id", function (d) {
@@ -752,7 +754,7 @@ window.gcexports.viewer = function () {
       leaf.append("text").attr("clip-path", function (d) {
         return d.clipUid;
       }).selectAll("tspan").data(function (d) {
-        return d.data.name.split(/(?=[A-Z][^A-Z])/g);
+        return d.data.type === "category" && [d.data.name] || d.data.name.split(/(?=[A-Z][^A-Z])/g);
       }).join("tspan").attr("x", 3).attr("y", function (d, i, nodes) {
         return (i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9 + "em";
       }).attr("fill-opacity", function (d, i, nodes) {
@@ -764,7 +766,7 @@ window.gcexports.viewer = function () {
       return svg.node();
     },
     render: function render() {
-      return React.createElement("svg", { className: "treemap-chart", width: "1000", height: "1000" });
+      return React.createElement("svg", { className: "treemap-chart", width: "1000", height: "600" });
     }
   });
   var Viewer = React.createClass({

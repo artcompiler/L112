@@ -398,12 +398,12 @@ const unpack = (name, data) => {
         kids.push(kid);
       }
     });
-    if (name) {
-      kids.push({
-        name: name,
-        type: "label",
-      });
-    }
+    // if (name) {
+    //   kids.push({
+    //     name: name,
+    //     type: "label",
+    //   });
+    // }
   }
   return kids.length && kids || undefined;
 };

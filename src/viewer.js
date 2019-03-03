@@ -465,16 +465,18 @@ window.gcexports.viewer = (function () {
                           .tile(d3.treemapSquarify.ratio(1))
                           .size([width, height])
                           .paddingInner(3)
-                          .paddingOuter(10)
-                          .round(true);
+                          .paddingOuter(3)
+                          .paddingTop(23)
+//                          .round(true);
       treemapLayout(root);
+
       const svg = d3.select("svg.treemap-chart")
         .style("width", "100%")
         .style("height", "auto")
         .style("font", "10px sans-serif");
 
       const leaf = svg.selectAll("g")
-        .data(root.leaves())
+        .data(root.children[0].descendants())
         .join("g")
         .attr("transform", d => {
           return `translate(${d.x0},${d.y0})`
@@ -492,9 +494,9 @@ window.gcexports.viewer = (function () {
         .style("fill", function(d) {
           return (
             d.depth === 0 && "#888" ||
-            (d.depth === 1 || d.depth === 2 && d.data.type === "label") && "FFF" ||
-            (d.depth === 2 || d.data.type === "label") && "#FFF" ||
-            "#DDD"
+            d.depth === 1 && "#AAA" ||
+            d.depth === 2 && "#CCC" ||
+            "#EEE"
           );
         });
 
@@ -506,7 +508,12 @@ window.gcexports.viewer = (function () {
       leaf.append("text")
         .attr("clip-path", d => d.clipUid)
         .selectAll("tspan")
-        .data(d => d.data.name.split(/(?=[A-Z][^A-Z])/g))
+        .data(d => {
+          return (
+            d.data.type === "category" && [d.data.name] ||
+            d.data.name.split(/(?=[A-Z][^A-Z])/g)
+          );
+        })
         .join("tspan")
         .attr("x", 3)
         .attr("y", (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`)
@@ -517,7 +524,7 @@ window.gcexports.viewer = (function () {
     },
     render () {
       return (
-        <svg className="treemap-chart" width="1000" height="1000"/>
+        <svg className="treemap-chart" width="1000" height="600"/>
       );
     },
   });
