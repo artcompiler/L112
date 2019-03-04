@@ -20,7 +20,8 @@ messages[1004] = "No visitor method defined for '%1'.";
 
 const transform = (function() {
   const table = {
-    "PACK-CHART": packChart,
+    "WIDTH": width,
+    "HEIGHT": height,
     "TREEMAP-CHART": treemapChart,
     "PROG" : program,
     "EXPRS" : exprs,
@@ -76,6 +77,22 @@ const transform = (function() {
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
+  function width(node, options, resume) {
+    visit(node.elts[0], options, function (err, val0) {
+      visit(node.elts[1], options, function (err, val1) {
+        val1.width = val0;
+        resume([], val1);
+      });
+    });
+  }
+  function height(node, options, resume) {
+    visit(node.elts[0], options, function (err, val0) {
+      visit(node.elts[1], options, function (err, val1) {
+        val1.height = val0;
+        resume([], val1);
+      });
+    });
+  }
   function packChart(node, options, resume) {
     visit(node.elts[0], options, function (err0, val0) {
       let data = stratify(val0);

@@ -692,6 +692,8 @@ window.gcexports.viewer = function () {
       }
     },
     render: function render() {
+      var width = this.props.width || 1500;
+      var height = this.props.height || 1500;
       return React.createElement("svg", { className: "pack-chart", width: "1500", height: "1500" });
     }
   });
@@ -774,7 +776,10 @@ window.gcexports.viewer = function () {
       return svg.node();
     },
     render: function render() {
-      return React.createElement("svg", { className: "treemap-chart", width: "1200", height: "800" });
+      console.log("render() this.props=" + JSON.stringify(this.props));
+      var width = this.props.width || 1200;
+      var height = this.props.height || 700;
+      return React.createElement("svg", { className: "treemap-chart", width: width, height: height });
     }
   });
   var Viewer = React.createClass({

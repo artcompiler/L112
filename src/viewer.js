@@ -437,6 +437,8 @@ window.gcexports.viewer = (function () {
       }
     },
     render () {
+      let width = this.props.width || 1500;
+      let height = this.props.height || 1500;
       return (
         <svg className="pack-chart" width="1500" height="1500"/>
       );
@@ -540,8 +542,11 @@ window.gcexports.viewer = (function () {
       return svg.node();
     },
     render () {
+      console.log("render() this.props=" + JSON.stringify(this.props));
+      let width = this.props.width || 1200;
+      let height = this.props.height || 700;
       return (
-        <svg className="treemap-chart" width="1200" height="800"/>
+        <svg className="treemap-chart" width={width} height={height}/>
       );
     },
   });
