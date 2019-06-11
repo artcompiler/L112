@@ -709,6 +709,8 @@ window.gcexports.viewer = function () {
         return b.value - a.value;
       });
 
+      d3.select("svg.treemap-chart").selectAll("*").remove();
+
       var svg = d3.select("svg.treemap-chart").style("width", "100%").style("height", "auto").style("font", "14px sans-serif");
 
       var width = +svg.attr("width"),
@@ -723,6 +725,12 @@ window.gcexports.viewer = function () {
       //                          .tile(d3.treemapSliceDice)
       .tile(d3.treemapSquarify.ratio(1)).size([width, height]).paddingInner(10).paddingOuter(10).paddingTop(45).round(true);
       treemapLayout(root);
+
+      if (!root.children) {
+        return;
+      }
+
+      var logoWidth = this.props.logoWidth || 50;
 
       var leaf = svg.selectAll("g").data(root.children[0].descendants()).join("g").attr("transform", function (d) {
         return "translate(" + d.x0 + "," + d.y0 + ")";
@@ -757,7 +765,7 @@ window.gcexports.viewer = function () {
       leaf.append("text").attr("clip-path", function (d) {
         return d.clipUid;
       }).selectAll("tspan").data(function (d) {
-        return (d.data.type === "business" || d.data.type === "category") && d.data.name.split(/(?=[A-Z][^A-Z])/g).slice(0, 2) || "" //d.data.name.split(/(?=[A-Z][^A-Z])/g)
+        return (d.data.type === "company" || d.data.type === "category") && d.data.name.split(/(?=[A-Z][^A-Z])/g).slice(0, 2) || "" //d.data.name.split(/(?=[A-Z][^A-Z])/g)
         ;
       }).join("tspan").attr("x", 10).attr("y", function (d, i, nodes) {
         return (i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9 + "em";
@@ -771,12 +779,11 @@ window.gcexports.viewer = function () {
         return d.clipUid;
       }).attr("xlink:href", function (d) {
         return d.depth > 1 && d.data.logo || undefined;
-      }).attr("width", 50).attr("x", 3).attr("y", 3);
+      }).attr("width", logoWidth).attr("x", 3).attr("y", 3);
 
       return svg.node();
     },
     render: function render() {
-      console.log("render() this.props=" + JSON.stringify(this.props));
       var width = this.props.width || 1200;
       var height = this.props.height || 700;
       return React.createElement("svg", { className: "treemap-chart", width: width, height: height });

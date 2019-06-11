@@ -1,8 +1,9 @@
 /* @flow */
 window.gcexports.globalLexicon = {
+  "logo-width" : { "tk": 1, "name": "LOGO-WIDTH", "cls": "function", "length": 2 },
   "width" : { "tk": 1, "name": "WIDTH", "cls": "function", "length": 2 },
   "height" : { "tk": 1, "name": "HEIGHT", "cls": "function", "length": 2 },
-  "treemap" : { "tk": 1, "name": "TREEMAP-CHART", "cls": "function", "length": 1, "arity": 1 },
+  "treemap" : { "tk": 1, "name": "TREEMAP-CHART", "cls": "function", "length": 0, "arity": 0 },
   "pack" : { "tk": 1, "name": "PACK-CHART", "cls": "function", "length": 1, "arity": 1 },
   "bar" : { "tk": 1, "name": "BAR-CHART", "cls": "function", "length": 2, "arity": 2 },
   "val" : { "tk": 1, "name": "VAL", "cls": "function", "length": 2 , "arity": 2 },

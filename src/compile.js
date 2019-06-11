@@ -20,6 +20,7 @@ messages[1004] = "No visitor method defined for '%1'.";
 
 const transform = (function() {
   const table = {
+    "LOGO-WIDTH": logoWidth,
     "WIDTH": width,
     "HEIGHT": height,
     "TREEMAP-CHART": treemapChart,
@@ -77,6 +78,14 @@ const transform = (function() {
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
+  function logoWidth(node, options, resume) {
+    visit(node.elts[0], options, function (err, val0) {
+      visit(node.elts[1], options, function (err, val1) {
+        val1.logoWidth = val0;
+        resume([], val1);
+      });
+    });
+  }
   function width(node, options, resume) {
     visit(node.elts[0], options, function (err, val0) {
       visit(node.elts[1], options, function (err, val1) {
@@ -105,14 +114,13 @@ const transform = (function() {
     });
   }
   function treemapChart(node, options, resume) {
-    visit(node.elts[0], options, function (err0, val0) {
-      let data = stratify(val0);
-      resume([].concat(err0), {
-        type: "treemap-chart",
-        args: {
-          data: data,
-        }
-      });
+    let data = options.data instanceof Array && options.data || [options.data];
+    let root = stratify(data);
+    resume([], {
+      type: "treemap-chart",
+      args: {
+        data: root,
+      }
     });
   }
   function str(node, options, resume) {
@@ -424,32 +432,34 @@ const unpack = (name, data) => {
   }
   return kids.length && kids || undefined;
 };
-const stratify = (data) => {
+function stratifyNode(root, {
+    type,
+    name,
+    url,
+    logo,
+    children,
+    category,
+    industry,
+  }) {
+  if (!root[name]) {
+    root[name] = {
+      type: type,
+//      name: name,
+      logo: logo,
+    };
+  }
+  if (children) {
+    children.forEach(data => {
+      stratifyNode(root[name], data);
+    });
+  }
+  return root;
+}
+
+function stratify(data) {
   let root = {};
-  data.forEach(({
-    company_name,
-    company_logo,
-    product_name,
-    product_logo,
-    category
-  }) => {
-    if (!root[company_name]) {
-      root[company_name] = {
-        type: "business",
-        logo: company_logo,
-      };
-    }
-    if (!root[company_name][category]) {
-      root[company_name][category] = {
-        type: "category",
-      };
-    }
-    if (!root[company_name][category][product_name]) {
-      root[company_name][category][product_name] = {
-        type: "product",
-        logo: product_logo,
-      };
-    }
+  data.forEach(d => {
+    stratifyNode(root, d);
   });
   root = {
     name: "root",
