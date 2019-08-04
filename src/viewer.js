@@ -109,6 +109,11 @@ window.gcexports.viewer = (function () {
           <PackChart key={i} style={n.style} {...n}/>
         );
         break;
+      case "stack-chart":
+        elts.push(
+          <StackChart key={i} style={n.style} {...n}/>
+        );
+        break;
       case "treemap-chart":
         elts.push(
           <TreemapChart key={i} style={n.style} {...n}/>
@@ -557,6 +562,29 @@ window.gcexports.viewer = (function () {
       );
     },
   });
+  var StackChart = React.createClass({
+    componentDidMount() {
+      this.componentDidUpdate();
+    },
+    componentDidUpdate() {
+//      d3.select("div.stack-chart").selectAll("*").remove();
+    },
+    render () {
+      let props = this.props;
+      var data = props.root ? [].concat(props.root) : [];
+      var elts = render(data, props);
+      let width = this.props.width || 1200;
+      let height = this.props.height || 700;
+      return (
+        <div>
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" crossorigin="anonymous" />
+          <div className="stack-chart viewer">
+          {elts}
+          </div>
+        </div>
+      );
+    },
+  });
   var Viewer = React.createClass({
     render () {
       // If you have nested components, make sure you send the props down to the
@@ -566,7 +594,8 @@ window.gcexports.viewer = (function () {
       var elts = render(data, props);
       return (
         <div>
-          <link rel="stylesheet" href="https://l112.artcompiler.com/style.css" />
+          <link type="text/css" rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" crossOrigin="anonymous" />
+          <link type="text/css" rel="stylesheet" href="/style.css" />
           <div className="L112">
             {elts}
           </div>

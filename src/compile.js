@@ -23,6 +23,7 @@ const transform = (function() {
     "LOGO-WIDTH": logoWidth,
     "WIDTH": width,
     "HEIGHT": height,
+    "STACK-CHART": stackChart,
     "TREEMAP-CHART": treemapChart,
     "PROG" : program,
     "EXPRS" : exprs,
@@ -111,6 +112,23 @@ const transform = (function() {
           data: data,
         }
       });
+    });
+  }
+  function stackChart(node, options, resume) {
+    let data = options.data instanceof Array && options.data || [options.data];
+    let root = {
+      "type": "container-fluid",
+      "args": {
+        "type": "h1",
+        "args": {
+          "type": "str",
+          "value": "hello, world!"
+        }
+      }
+    };
+    resume([], {
+      type: "stack-chart",
+      root: root,
     });
   }
   function treemapChart(node, options, resume) {
@@ -475,6 +493,7 @@ export let compiler = (function () {
         data: data
       };
       transform(code, options, function (err, val) {
+        console.log("compile() val=" + JSON.stringify(val));
         if (err.length) {
           resume(err, val);
         } else {

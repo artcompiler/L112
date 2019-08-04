@@ -375,6 +375,9 @@ window.gcexports.viewer = function () {
         case "pack-chart":
           elts.push(React.createElement(PackChart, _extends({ key: i, style: n.style }, n)));
           break;
+        case "stack-chart":
+          elts.push(React.createElement(StackChart, _extends({ key: i, style: n.style }, n)));
+          break;
         case "treemap-chart":
           elts.push(React.createElement(TreemapChart, _extends({ key: i, style: n.style }, n)));
           break;
@@ -789,6 +792,32 @@ window.gcexports.viewer = function () {
       return React.createElement("svg", { className: "treemap-chart", width: width, height: height });
     }
   });
+  var StackChart = React.createClass({
+    displayName: "StackChart",
+    componentDidMount: function componentDidMount() {
+      this.componentDidUpdate();
+    },
+    componentDidUpdate: function componentDidUpdate() {
+      //      d3.select("div.stack-chart").selectAll("*").remove();
+    },
+    render: function render() {
+      var props = this.props;
+      var data = props.root ? [].concat(props.root) : [];
+      var elts = _render(data, props);
+      var width = this.props.width || 1200;
+      var height = this.props.height || 700;
+      return React.createElement(
+        "div",
+        null,
+        React.createElement("link", { rel: "stylesheet", href: "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css", crossorigin: "anonymous" }),
+        React.createElement(
+          "div",
+          { className: "stack-chart viewer" },
+          elts
+        )
+      );
+    }
+  });
   var Viewer = React.createClass({
     displayName: "Viewer",
     render: function render() {
@@ -800,7 +829,8 @@ window.gcexports.viewer = function () {
       return React.createElement(
         "div",
         null,
-        React.createElement("link", { rel: "stylesheet", href: "https://l112.artcompiler.com/style.css" }),
+        React.createElement("link", { type: "text/css", rel: "stylesheet", href: "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css", crossOrigin: "anonymous" }),
+        React.createElement("link", { type: "text/css", rel: "stylesheet", href: "/style.css" }),
         React.createElement(
           "div",
           { className: "L112" },
