@@ -187,7 +187,7 @@ const transform = (function() {
     return {
       "type": "col",
       "style": {
-        "margin": "4",
+        "margin": "5",
         "background": "#f6f6f6",
         "borderWidth": "1",
         "borderColor": "#cccece",
