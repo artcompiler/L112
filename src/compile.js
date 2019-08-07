@@ -20,6 +20,12 @@ messages[1004] = "No visitor method defined for '%1'.";
 
 const transform = (function() {
   const table = {
+    "TABLE" : tbl,
+    "THEAD" : thead,
+    "TBODY" : tbody,
+    "TR" : tr,
+    "TH" : th,
+    "TD" : td,
     "LOGO-WIDTH": logoWidth,
     "WIDTH": width,
     "HEIGHT": height,
@@ -79,6 +85,54 @@ const transform = (function() {
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
+  function tbl(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "table",
+        args: val1,
+      });
+    });
+  };
+  function thead(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "thead",
+        args: val1,
+      });
+    });
+  };
+  function tbody(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "tbody",
+        args: val1,
+      });
+    });
+  };
+  function tr(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "tr",
+        args: val1,
+      });
+    });
+  };
+  function th(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "th",
+        args: val1,
+      });
+    });
+  };
+  function td(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume([].concat(err1), {
+        type: "td",
+        args: val1,
+      });
+    });
+  };
   function logoWidth(node, options, resume) {
     visit(node.elts[0], options, function (err, val0) {
       visit(node.elts[1], options, function (err, val1) {
@@ -114,18 +168,96 @@ const transform = (function() {
       });
     });
   }
+  function renderCategory(data) {
+    let categoryName = data.name;
+    let children = data.children;
+    let products = [];
+    children.forEach(child => {
+      products.push({
+        "type": "tr",
+        "args": [{
+          "type": "td",
+          "args": [{
+            "type": "str",
+            "value": child.name,
+          }]
+        }],
+      },);
+    });
+    return {
+      "type": "col",
+      "style": {
+        "margin": "4",
+        "background": "#f6f6f6",
+        "borderWidth": "1",
+        "borderColor": "#cccece",
+        "borderStyle": "solid",
+        "borderRadius": "5",
+      },
+      "args": [{
+        "type": "table",
+        "args": [{
+          "type": "thead",
+          "args": [{
+            "type": "tr",
+            "args": [{
+              "type": "th",
+              "args": [{
+                "type": "str",
+                "style": {
+                  "fontSize": "12",
+                },
+                "value": categoryName.toUpperCase(),
+              }]
+            }],
+          }],
+        },{
+          "type": "tbody",
+          "args": products,
+        }]
+      }]
+    };
+  };
+  function renderCompany(data) {
+    if (!data.name || !data.children) {
+      return {
+      };
+    }
+    let companyName = data.name;
+    let children = data.children;
+    let categories = [];
+    children.forEach(child => {
+      categories.push(renderCategory(child));
+    });
+    return {
+      "type": "container",
+      "style": {
+        "margin": "10 4",
+      },
+      "args": [{
+        "type": "row",
+        "style": {
+          "margin": "4",
+        },
+        "args": [{
+          "type": "h1",
+          "args": {
+            "type": "str",
+            "value": companyName,
+          }
+        }]
+      }, {
+        "type": "row",
+        "style": {
+          "margin": "4",
+        },
+        "args": categories,
+      }]
+    };
+  }
   function stackChart(node, options, resume) {
     let data = options.data instanceof Array && options.data || [options.data];
-    let root = {
-      "type": "container-fluid",
-      "args": {
-        "type": "h1",
-        "args": {
-          "type": "str",
-          "value": "hello, world!"
-        }
-      }
-    };
+    let root = renderCompany(data[0]);
     resume([], {
       type: "stack-chart",
       root: root,
@@ -451,18 +583,18 @@ const unpack = (name, data) => {
   return kids.length && kids || undefined;
 };
 function stratifyNode(root, {
-    type,
-    name,
-    url,
-    logo,
-    children,
-    category,
-    industry,
-  }) {
+  type,
+  name,
+  url,
+  logo,
+  children,
+  category,
+  industry,
+}) {
   if (!root[name]) {
     root[name] = {
       type: type,
-//      name: name,
+      //      name: name,
       logo: logo,
     };
   }
@@ -493,7 +625,6 @@ export let compiler = (function () {
         data: data
       };
       transform(code, options, function (err, val) {
-        console.log("compile() val=" + JSON.stringify(val));
         if (err.length) {
           resume(err, val);
         } else {

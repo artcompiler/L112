@@ -296,6 +296,48 @@ window.gcexports.viewer = function () {
         args = _render(n.args, props);
       }
       switch (n.type) {
+        case "table":
+          elts.push(React.createElement(
+            "table",
+            _extends({ className: "table", key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "thead":
+          elts.push(React.createElement(
+            "thead",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "tbody":
+          elts.push(React.createElement(
+            "tbody",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "tr":
+          elts.push(React.createElement(
+            "tr",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "th":
+          elts.push(React.createElement(
+            "th",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
+        case "td":
+          elts.push(React.createElement(
+            "td",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
         case "container":
           elts.push(React.createElement(
             "div",

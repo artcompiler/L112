@@ -26,6 +26,48 @@ window.gcexports.viewer = (function () {
         args = render(n.args, props);
       }
       switch (n.type) {
+      case "table":
+        elts.push(
+          <table className="table" key={i} style={n.style} {...n.attrs}>
+            {args}
+          </table>
+        );
+        break;
+      case "thead":
+        elts.push(
+          <thead key={i} style={n.style} {...n.attrs}>
+            {args}
+          </thead>
+        );
+        break;
+      case "tbody":
+        elts.push(
+          <tbody key={i} style={n.style} {...n.attrs}>
+            {args}
+          </tbody>
+        );
+        break;
+      case "tr":
+        elts.push(
+          <tr key={i} style={n.style} {...n.attrs}>
+            {args}
+          </tr>
+        );
+        break;
+      case "th":
+        elts.push(
+          <th key={i} style={n.style} {...n.attrs}>
+            {args}
+          </th>
+        );
+        break;
+      case "td":
+        elts.push(
+          <td key={i} style={n.style} {...n.attrs}>
+            {args}
+          </td>
+        );
+        break;
       case "container":
         elts.push(
           <div className="container" key={i} style={n.style} {...n.attrs}>

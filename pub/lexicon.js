@@ -1,5 +1,11 @@
 /* @flow */
 window.gcexports.globalLexicon = {
+  "table" : { "tk": 1, "name": "TABLE", "cls": "function", "length": 1, "arity": 1 },
+  "thead" : { "tk": 1, "name": "THEAD", "cls": "function", "length": 1, "arity": 1 },
+  "tbody" : { "tk": 1, "name": "TBODY", "cls": "function", "length": 1, "arity": 1 },
+  "th" : { "tk": 1, "name": "TH", "cls": "function", "length": 1, "arity": 1 },
+  "tr" : { "tk": 1, "name": "TR", "cls": "function", "length": 1, "arity": 1 },
+  "td" : { "tk": 1, "name": "TD", "cls": "function", "length": 1, "arity": 1 },
   "logo-width" : { "tk": 1, "name": "LOGO-WIDTH", "cls": "function", "length": 2 },
   "width" : { "tk": 1, "name": "WIDTH", "cls": "function", "length": 2 },
   "height" : { "tk": 1, "name": "HEIGHT", "cls": "function", "length": 2 },
