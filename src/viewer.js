@@ -363,7 +363,7 @@ window.gcexports.viewer = (function () {
         break;
       case "img":
         elts.push(
-          <img key={i} style={n.style} {...n.attrs}/>
+          <img key={i} onError={(e) => {e.target.style.display='none'}} style={n.style} {...n.attrs}/>
         );
         break;
       case "a":
@@ -628,7 +628,7 @@ window.gcexports.viewer = (function () {
       let height = this.props.height || 700;
       return (
         <div>
-          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" crossorigin="anonymous" />
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" crossOrigin="anonymous" />
           <div className="stack-chart viewer">
           {elts}
           </div>

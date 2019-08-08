@@ -623,7 +623,9 @@ window.gcexports.viewer = function () {
           ));
           break;
         case "img":
-          elts.push(React.createElement("img", _extends({ key: i, style: n.style }, n.attrs)));
+          elts.push(React.createElement("img", _extends({ key: i, onError: function onError(e) {
+              e.target.style.display = 'none';
+            }, style: n.style }, n.attrs)));
           break;
         case "a":
           elts.push(React.createElement(
@@ -864,7 +866,7 @@ window.gcexports.viewer = function () {
       return React.createElement(
         "div",
         null,
-        React.createElement("link", { rel: "stylesheet", href: "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css", crossorigin: "anonymous" }),
+        React.createElement("link", { rel: "stylesheet", href: "https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css", crossOrigin: "anonymous" }),
         React.createElement(
           "div",
           { className: "stack-chart viewer" },

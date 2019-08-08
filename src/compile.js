@@ -182,28 +182,40 @@ const transform = (function() {
             "padding": "0px 0 5",
           },
           "args": [{
-            "type": "div",
+            "type": "a",
             "style": {
-              "background": "#FFF",
-              "borderWidth": "1px",
-              "padding": "4 10",
-              "borderColor": "#cccece",
-              "borderStyle": "solid",
-              "borderRadius": "5px",
+              "color": "#333",
+            },
+            "attrs": {
+              "href": child.url,
             },
             "args": [{
-              "type": "img",
+              "type": "div",
               "style": {
-                "margin": "5 5 5 0",
-                "width": "23",
-                "height": "23",
+                "background": "#FFF",
+                "borderWidth": "1px",
+                "padding": "10 10",
+                "borderColor": "#cccece",
+                "borderStyle": "solid",
+                "borderRadius": "5px",
               },
-              "attrs": {
-                "src": child.logo,
-              },
-            }, {
-              "type": "str",
-              "value": child.name,
+              "args": [{
+                "type": "img",
+                "style": {
+                  "margin": "0 5 0 0",
+                  "width": "20",
+                  "height": "20",
+                },
+                "attrs": {
+                  "src": child.logo,
+                },
+              }, {
+                "type": "str",
+                "style": {
+                  "margin": "12px 0",
+                },
+                "value": child.name,
+              }],
             }],
           }],
         }],
@@ -271,7 +283,7 @@ const transform = (function() {
       "args": [{
         "type": "row",
         "style": {
-          "margin": "4",
+          "margin": "1",
         },
         "args": [{
           "type": "img",
@@ -282,6 +294,7 @@ const transform = (function() {
           },
           "attrs": {
             "src": companyLogo,
+            "onerror": "this.style.display='none'",
           },
         }, {
           "type": "h1",
