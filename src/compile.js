@@ -177,6 +177,8 @@ const transform = (function() {
         "type": "tr",
         "args": [{
           "type": "td",
+          "style": {
+          },
           "args": [{
             "type": "str",
             "value": child.name,
@@ -185,7 +187,7 @@ const transform = (function() {
       },);
     });
     return {
-      "type": "col",
+      "type": "col-2",
       "style": {
         "margin": "5",
         "background": "#f6f6f6",
@@ -230,7 +232,7 @@ const transform = (function() {
       categories.push(renderCategory(child));
     });
     return {
-      "type": "container",
+      "type": "container-fluid",
       "style": {
         "margin": "10 4",
       },

@@ -127,16 +127,22 @@ window.gcexports.viewer = (function () {
       case "row":
       case "col":
       case "col-sm":
+      case "col-sm-2":
+      case "col-sm-3":
       case "col-sm-4":
+      case "col-md":
+      case "col-md-2":
+      case "col-md-3":
+      case "col-md-4":
         elts.push(
           <div className={n.type} key={i} style={n.style} {...n.attrs}>
             {args}
           </div>
         );
         break;
-      case "col-sm":
+      case "col-2":
         elts.push(
-          <div className="col-sm" key={i} style={n.style} {...n.attrs}>
+          <div className={"col-sm-4 col-md-3 col-lg-2"} key={i} style={n.style} {...n.attrs}>
             {args}
           </div>
         );
