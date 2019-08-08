@@ -286,6 +286,39 @@ const transform = (function() {
           "margin": "4",
         },
         "args": [{
+          "type": "col",
+          "args": [{
+          }],
+        }, {
+          "type": "col-4",
+          "args": [{
+            "type": "str",
+            "style": {
+              "fontSize": "14",
+              "fontWeight": "600",
+            },
+            "value": "POWERED BY ",
+          }, {
+          "type": "img",
+          "style": {
+            "margin": "0 0 2",
+            "height": "25",
+          },
+          "attrs": {
+            "src": "https://static.chief.io/static/logo/logo-sm.png",
+          },
+        }],
+        }, {
+          "type": "col",
+          "args": [{
+          }],
+        }],
+      }, {
+        "type": "row",
+        "style": {
+          "margin": "4",
+        },
+        "args": [{
           "type": "img",
           "style": {
             "margin": "10 10",
@@ -294,15 +327,13 @@ const transform = (function() {
           },
           "attrs": {
             "src": companyLogo,
-            "onerror": "this.style.display='none'",
           },
         }, {
-          "type": "h1",
-          "args": {
-            "type": "str",
-            "value": companyName,
-          }
-        }]
+        "type": "h1",
+        "args": {
+          "type": "str",
+          "value": companyName,
+        }
       }, {
         "type": "row",
         "style": {
@@ -310,7 +341,8 @@ const transform = (function() {
         },
         "args": categories,
       }]
-    };
+      }]
+    }
   }
   function stackChart(node, options, resume) {
     let data = options.data instanceof Array && options.data || [options.data];
