@@ -283,7 +283,7 @@ const transform = (function() {
       "args": [{
         "type": "row",
         "style": {
-          "margin": "1",
+          "margin": "4",
         },
         "args": [{
           "type": "img",
