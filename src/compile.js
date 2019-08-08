@@ -178,11 +178,34 @@ const transform = (function() {
         "args": [{
           "type": "td",
           "style": {
+            "borderWidth": "0px",
+            "padding": "0px 0 5",
           },
           "args": [{
-            "type": "str",
-            "value": child.name,
-          }]
+            "type": "div",
+            "style": {
+              "background": "#FFF",
+              "borderWidth": "1px",
+              "padding": "4 10",
+              "borderColor": "#cccece",
+              "borderStyle": "solid",
+              "borderRadius": "5px",
+            },
+            "args": [{
+              "type": "img",
+              "style": {
+                "margin": "5 5 5 0",
+                "width": "23",
+                "height": "23",
+              },
+              "attrs": {
+                "src": child.logo,
+              },
+            }, {
+              "type": "str",
+              "value": child.name,
+            }],
+          }],
         }],
       },);
     });
@@ -194,7 +217,8 @@ const transform = (function() {
         "borderWidth": "1",
         "borderColor": "#cccece",
         "borderStyle": "solid",
-        "borderRadius": "5",
+        "borderRadius": "5px",
+        "padding": "5px",
       },
       "args": [{
         "type": "table",
@@ -204,6 +228,10 @@ const transform = (function() {
             "type": "tr",
             "args": [{
               "type": "th",
+              "style": {
+                "borderWidth": "0px",
+                "padding": "5px 2px 10px",
+              },
               "args": [{
                 "type": "str",
                 "style": {
@@ -226,8 +254,12 @@ const transform = (function() {
       };
     }
     let companyName = data.name;
+    let companyLogo = data.logo;
     let children = data.children;
     let categories = [];
+    children.sort((a, b) => {
+      return b.children.length - a.children.length;
+    });
     children.forEach(child => {
       categories.push(renderCategory(child));
     });
@@ -242,6 +274,16 @@ const transform = (function() {
           "margin": "4",
         },
         "args": [{
+          "type": "img",
+          "style": {
+            "margin": "10 10",
+            "width": "30",
+            "height": "30",
+          },
+          "attrs": {
+            "src": companyLogo,
+          },
+        }, {
           "type": "h1",
           "args": {
             "type": "str",

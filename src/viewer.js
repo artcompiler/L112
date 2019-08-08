@@ -373,6 +373,9 @@ window.gcexports.viewer = (function () {
           </a>
         );
         break;
+      case "div":
+        elts.push(<div key={i} style={n.style} {...n.attrs}>{args}</div>);
+        break;
       case "title":
         document.title = n.value;
         break;

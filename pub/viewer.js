@@ -632,6 +632,13 @@ window.gcexports.viewer = function () {
             args
           ));
           break;
+        case "div":
+          elts.push(React.createElement(
+            "div",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
         case "title":
           document.title = n.value;
           break;
