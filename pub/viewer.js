@@ -396,8 +396,11 @@ window.gcexports.viewer = function () {
           break;
         case "row":
         case "col":
-        case "col-4":
         case "col-2":
+        case "col-3":
+        case "col-4":
+        case "col-6":
+        case "col-12":
         case "col-sm":
         case "col-sm-2":
         case "col-sm-3":
@@ -643,6 +646,13 @@ window.gcexports.viewer = function () {
             args
           ));
           break;
+        case "span":
+          elts.push(React.createElement(
+            "span",
+            _extends({ key: i, style: n.style }, n.attrs),
+            args
+          ));
+          break;
         case "title":
           document.title = n.value;
           break;
@@ -673,7 +683,7 @@ window.gcexports.viewer = function () {
         case "str":
           elts.push(React.createElement(
             "span",
-            { className: "u-full-width", key: i, style: n.style },
+            _extends({ className: "u-full-width", key: i }, n.attrs, { style: n.style }),
             "" + n.value
           ));
           break;

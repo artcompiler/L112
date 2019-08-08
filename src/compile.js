@@ -319,29 +319,38 @@ const transform = (function() {
           "margin": "4",
         },
         "args": [{
-          "type": "img",
+          "type": "col-12",
           "style": {
-            "margin": "10 10",
-            "width": "30",
-            "height": "30",
+            "margin": "0",
+            "padding": "0",
           },
-          "attrs": {
-            "src": companyLogo,
-          },
-        }, {
-        "type": "h1",
-        "args": {
-          "type": "str",
-          "value": companyName,
-        }
+          "args": [{
+            "type": "img",
+            "style": {
+              "margin": "0 5 10 5",
+              "width": "30",
+              "height": "30",
+            },
+            "attrs": {
+              "src": companyLogo,
+            },
+          }, {
+            "type": "str",
+            "style": {
+              "margin": "5",
+              "fontSize": "30",
+              "fontWeight": "400",
+            },
+            "value": companyName,
+          }]
+        }],
       }, {
         "type": "row",
         "style": {
           "margin": "4",
         },
         "args": categories,
-      }]
-      }]
+      }],
     }
   }
   function stackChart(node, options, resume) {
