@@ -396,7 +396,6 @@ window.gcexports.viewer = function () {
           break;
         case "row":
         case "col":
-        case "col-2":
         case "col-3":
         case "col-4":
         case "col-6":
