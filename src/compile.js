@@ -238,6 +238,9 @@ const transform = (function() {
         },
         "args": [{
           "type": "table",
+          "style": {
+            "marginBottom": "0",
+          },
           "args": [{
             "type": "thead",
             "args": [{
@@ -299,7 +302,7 @@ const transform = (function() {
           "args": [{
             "type": "str",
             "style": {
-              "fontSize": "14",
+              "fontSize": "13",
               "fontWeight": "600",
             },
             "value": "POWERED BY ",
@@ -307,7 +310,7 @@ const transform = (function() {
           "type": "img",
           "style": {
             "margin": "0 0 2",
-            "height": "25",
+            "height": "22",
           },
           "attrs": {
             "src": "https://static.chief.io/static/logo/logo-sm.png",
